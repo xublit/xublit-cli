@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/proc-ctrl-interface.es6"],"names":[],"mappings":";;;;;;;;IAAqB,0BAEjB,SAFiB,uBAEjB,GAAe;0BAFE,yBAEF;CAAf;;kBAFiB","file":"proc-ctrl-interface.js","sourcesContent":["export default class ProcessControlInterface {\n\n    constructor () {\n        \n    }\n\n}\n"]}

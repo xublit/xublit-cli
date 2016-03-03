@@ -1,0 +1,38 @@
+{
+  "name": "xublit-cli",
+  "version": "0.1.0",
+  "description": "Xublit command line interface",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt unit"
+  },
+  "bin": {
+    "xublit": "./bin/xublit"
+  },
+  "author": "Cal Milne <cal@calmilne.com> (http://calmilne.com/)",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "commander-plus": "0.0.6",
+    "shelljs": "^0.6.0",
+    "xublit-etc": "^1.0.0-rc.1",
+    "xublit-injector": "^1.0.0-rc.1"
+  },
+  "devDependencies": {
+    "faithful-exec": "^0.1.0",
+    "babel-core": "^6.4.5",
+    "babel-polyfill": "^6.3.14",
+    "babel-preset-es2015": "^6.3.13",
+    "grunt": "^0.4.5",
+    "grunt-babel": "^6.0.0",
+    "grunt-banner": "^0.6.0",
+    "grunt-contrib-clean": "^0.7.0",
+    "grunt-contrib-jshint": "^0.12.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "jasmine": "^2.4.1",
+    "jasmine-core": "^2.4.1",
+    "jasmine-spec-reporter": "^2.4.0",
+    "load-grunt-tasks": "^3.4.0",
+    "q": "^1.4.1"
+  }
+}

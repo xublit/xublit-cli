@@ -1,0 +1,28 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'ln' ]
+2 info using npm@2.14.12
+3 info using node@v4.2.6
+4 verbose linkPkg /home/cal/Projects/.luminous-patterns/xublit/xublit-cli/xublit-cli
+5 silly gentlyRm /usr/local/lib/node_modules/xublit-cli is being purged
+6 verbose gentlyRm don't care about contents; nuking /usr/local/lib/node_modules/xublit-cli
+7 silly vacuum-fs purging /usr/local/lib/node_modules/xublit-cli
+8 verbose stack Error: EACCES: permission denied, unlink '/usr/local/lib/node_modules/xublit-cli'
+8 verbose stack     at Error (native)
+9 verbose cwd /home/cal/Projects/.luminous-patterns/xublit/xublit-cli/xublit-cli
+10 error Linux 4.2.0-16-generic
+11 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "ln"
+12 error node v4.2.6
+13 error npm  v2.14.12
+14 error path /usr/local/lib/node_modules/xublit-cli
+15 error code EACCES
+16 error errno -13
+17 error syscall unlink
+18 error Error: EACCES: permission denied, unlink '/usr/local/lib/node_modules/xublit-cli'
+18 error     at Error (native)
+18 error  { [Error: EACCES: permission denied, unlink '/usr/local/lib/node_modules/xublit-cli']
+18 error   errno: -13,
+18 error   code: 'EACCES',
+18 error   syscall: 'unlink',
+18 error   path: '/usr/local/lib/node_modules/xublit-cli' }
+19 error Please try running this command again as root/Administrator.
+20 verbose exit [ -13, true ]

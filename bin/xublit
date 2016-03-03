@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+var XublitCli = require('../dist/xublit-cli').default;
+var xublitCli = new XublitCli();
