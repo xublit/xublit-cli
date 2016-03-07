@@ -109,7 +109,6 @@ module.exports = function (grunt) {'use strict';
                 files: [
                     'src/**/*.es6',
                     'test/**/*.es6',
-                    'bin/xublit',
                 ],
                 tasks: [
                     'build',
