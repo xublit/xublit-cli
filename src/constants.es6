@@ -54,6 +54,8 @@ export const APP_DIR_PATH_SUFFIX = 'xublit';
 export const WINDOWS_TMP_DATA_DIR_PATH = process.env.TMP || process.env.TEMP;
 export const WINDOWS_APP_DATA_DIR_PATH = process.env.APPDATA;
 
+export const OSX_EL_CAPITAN_APP_DATA_DIR_PATH = '/usr/local/lib';
+
 export const UNIX_TMP_DATA_DIR_PATH = '/var/tmp';
 export const UNIX_APP_DATA_DIR_PATH = '/usr/lib';
 
@@ -101,6 +103,10 @@ function appDataDirPath () {
             dirPath = WINDOWS_APP_DATA_DIR_PATH;
             break;
 
+        case 'darwin':
+            dirPath = OSX_EL_CAPITAN_APP_DATA_DIR_PATH;
+            break;
+
         case 'linux':
             // no break
 
@@ -108,9 +114,6 @@ function appDataDirPath () {
             // no break
 
         case 'sunos':
-            // no break
-
-        case 'darwin':
             // no break
         
         default:
