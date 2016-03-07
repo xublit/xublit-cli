@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.APP_DATA_DIR_PATH = exports.TMP_DATA_DIR_PATH = exports.UNIX_APP_DATA_DIR_PATH = exports.UNIX_TMP_DATA_DIR_PATH = exports.WINDOWS_APP_DATA_DIR_PATH = exports.WINDOWS_TMP_DATA_DIR_PATH = exports.PROCMGR_REGISTRY_TEMPLATE = exports.PROCMGR_REGFILE_FILENAME = exports.NPM_PACKAGE_CONFIG_FILENAME = exports.XUBLIT_CONFIG_FILENAME = exports.USAGE_INSTRUCTIONS = exports.INVALID_NPM_PACKAGE_ROOT = exports.INVALID_XUBLIT_APPLICATION_ROOT = exports.STAT_KEY_CONFIGURED_ENVS = exports.STAT_KEY_SOURCE_FILES = exports.STAT_KEY_TEST_SPECS = exports.TEST_SPEC_DIRS_CONFIG_KEY = exports.SOURCE_DIRS_CONFIG_KEY = exports.ETC_DIRS_CONFIG_KEY = undefined;
+exports.APP_DATA_DIR_PATH = exports.TMP_DATA_DIR_PATH = exports.UNIX_APP_DATA_DIR_PATH = exports.UNIX_TMP_DATA_DIR_PATH = exports.OSX_EL_CAPITAN_APP_DATA_DIR_PATH = exports.WINDOWS_APP_DATA_DIR_PATH = exports.WINDOWS_TMP_DATA_DIR_PATH = exports.APP_DIR_PATH_SUFFIX = exports.NPM_PACKAGE_CONFIG_FILENAME = exports.XUBLIT_CONFIG_FILENAME = exports.USAGE_INSTRUCTIONS = exports.INVALID_NPM_PACKAGE_ROOT = exports.INVALID_XUBLIT_APPLICATION_ROOT = exports.STAT_KEY_CONFIGURED_ENVS = exports.STAT_KEY_SOURCE_FILES = exports.STAT_KEY_TEST_SPECS = exports.TEST_SPEC_DIRS_CONFIG_KEY = exports.SOURCE_DIRS_CONFIG_KEY = exports.ETC_DIRS_CONFIG_KEY = undefined;
 
 var _path = require('path');
 
@@ -46,28 +46,18 @@ var XUBLIT_CONFIG_FILENAME = exports.XUBLIT_CONFIG_FILENAME = 'xublit.json';
 var NPM_PACKAGE_CONFIG_FILENAME = exports.NPM_PACKAGE_CONFIG_FILENAME = 'package.json';
 
 /**
- * Process manager
- */
-
-var PROCMGR_REGFILE_FILENAME = exports.PROCMGR_REGFILE_FILENAME = '.xublit-proc';
-var PROCMGR_REGISTRY_TEMPLATE = exports.PROCMGR_REGISTRY_TEMPLATE = Object.freeze({
-    createdAt: null,
-    lastModifiedAt: null,
-    path: null,
-    processes: Object.freeze({
-        running: Object.freeze([])
-    })
-});
-
-/**
  * System directory paths
  */
+
+var APP_DIR_PATH_SUFFIX = exports.APP_DIR_PATH_SUFFIX = 'xublit';
 
 var WINDOWS_TMP_DATA_DIR_PATH = exports.WINDOWS_TMP_DATA_DIR_PATH = process.env.TMP || process.env.TEMP;
 var WINDOWS_APP_DATA_DIR_PATH = exports.WINDOWS_APP_DATA_DIR_PATH = process.env.APPDATA;
 
+var OSX_EL_CAPITAN_APP_DATA_DIR_PATH = exports.OSX_EL_CAPITAN_APP_DATA_DIR_PATH = '/usr/local/lib';
+
 var UNIX_TMP_DATA_DIR_PATH = exports.UNIX_TMP_DATA_DIR_PATH = '/var/tmp';
-var UNIX_APP_DATA_DIR_PATH = exports.UNIX_APP_DATA_DIR_PATH = '/var/lib';
+var UNIX_APP_DATA_DIR_PATH = exports.UNIX_APP_DATA_DIR_PATH = '/usr/lib';
 
 var TMP_DATA_DIR_PATH = exports.TMP_DATA_DIR_PATH = tempDataDirPath();
 var APP_DATA_DIR_PATH = exports.APP_DATA_DIR_PATH = appDataDirPath();
@@ -99,7 +89,7 @@ function tempDataDirPath() {
 
     }
 
-    return path.join(dirPath, 'xublit');
+    return path.join(dirPath, APP_DIR_PATH_SUFFIX);
 }
 
 function appDataDirPath() {
@@ -112,6 +102,10 @@ function appDataDirPath() {
             dirPath = WINDOWS_APP_DATA_DIR_PATH;
             break;
 
+        case 'darwin':
+            dirPath = OSX_EL_CAPITAN_APP_DATA_DIR_PATH;
+            break;
+
         case 'linux':
         // no break
 
@@ -121,14 +115,11 @@ function appDataDirPath() {
         case 'sunos':
         // no break
 
-        case 'darwin':
-        // no break
-
         default:
             dirPath = UNIX_APP_DATA_DIR_PATH;
 
     }
 
-    return path.join(dirPath, 'xublit');
+    return path.join(dirPath, APP_DIR_PATH_SUFFIX);
 }
 //# sourceMappingURL=constants.js.map

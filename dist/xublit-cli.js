@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -11,10 +11,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _util = require('util');
-
-var util = _interopRequireWildcard(_util);
 
 var _path = require('path');
 
@@ -40,11 +36,15 @@ var _npmPkgRoot = require('./file-system/npm-pkg-root');
 
 var _npmPkgRoot2 = _interopRequireDefault(_npmPkgRoot);
 
-var _cliTmpRoot = require('./file-system/cli-tmp-root');
+var _cliAppDataRoot = require('./file-system/directories/cli-app-data-root');
 
-var _cliTmpRoot2 = _interopRequireDefault(_cliTmpRoot);
+var _cliAppDataRoot2 = _interopRequireDefault(_cliAppDataRoot);
 
-var _cmdRunner = require('./cmd-runner');
+var _procManager = require('./proc-manager');
+
+var _procManager2 = _interopRequireDefault(_procManager);
+
+var _cliCommands = require('./cli-commands');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -65,6 +65,8 @@ var XublitCli = function () {
 
         initProps(this, opts);
 
+        initProcessManager(this);
+
         initCli(this);
     }
 
@@ -76,7 +78,7 @@ var XublitCli = function () {
                 return;
             }
 
-            throw new Error(util.format('Xublit Application not found in %s', this.pwd));
+            throw new Error('Xublit Application not found in ' + this.pwd);
         }
     }]);
 
@@ -92,14 +94,25 @@ function initCli(xublitCli) {
 
     _commanderPlus2.default.usage(__.USAGE_INSTRUCTIONS);
 
-    var availableCmds = (0, _cmdRunner.list)();
+    var availableCmds = (0, _cliCommands.list)();
     availableCmds.forEach(function (cmd) {
         _commanderPlus2.default.on(cmd, function () {
-            (0, _cmdRunner.run)(cmd, xublitCli);
+            (0, _cliCommands.run)(cmd, xublitCli);
         });
     });
 
     _commanderPlus2.default.parse(process.argv);
+}
+
+function initProcessManager(xublitCli) {
+
+    var processManager = new _procManager2.default(xublitCli);
+
+    Object.defineProperty(xublitCli, 'processManager', {
+        get: function get() {
+            return processManager;
+        }
+    });
 }
 
 function initProps(xublitCli, opts) {
@@ -109,7 +122,7 @@ function initProps(xublitCli, opts) {
     var xublitApplication;
 
     try {
-        xublitApplication = new _xublitApplication2.default(opts.pwd);
+        xublitApplication = new _xublitApplication2.default(xublitCli, opts.pwd);
     } catch (error) {
         // fail silently
     }
@@ -117,10 +130,10 @@ function initProps(xublitCli, opts) {
     var workingDirectory = undefined !== xublitApplication ? xublitApplication.rootDirectory : new _directory2.default(opts.pwd);
 
     var cliDirectory = new _npmPkgRoot2.default(opts.cliRootPath);
-    var tempDirectory = new _cliTmpRoot2.default(__.TMP_DATA_DIR_PATH);
+    var dataDirectory = new _cliAppDataRoot2.default(__.APP_DATA_DIR_PATH);
 
     var npmConfigFile = cliDirectory.npmConfigFile;
-    var npmConfig = npmConfigFile.parseContents(JSON.parse);
+    var npmConfig = JSON.parse(npmConfigFile.contents);
 
     Object.defineProperties(xublitCli, {
 
@@ -166,8 +179,8 @@ function initProps(xublitCli, opts) {
             }
         },
 
-        tempDirectory: {
-            value: tempDirectory
+        dataDirectory: {
+            value: dataDirectory
         },
 
         workingDirectory: {

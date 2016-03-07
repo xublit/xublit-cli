@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */

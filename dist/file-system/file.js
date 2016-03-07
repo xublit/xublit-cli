@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -16,9 +16,9 @@ var _path = require('path');
 
 var path = _interopRequireWildcard(_path);
 
-var _shelljs = require('shelljs');
+var _fs = require('fs');
 
-var sh = _interopRequireWildcard(_shelljs);
+var fs = _interopRequireWildcard(_fs);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -52,6 +52,8 @@ exports.default = File;
 
 function initProps(file, absPath) {
 
+    var fd = fs.openSync(absPath, 'r+');
+
     Object.defineProperties(file, {
 
         absPath: {
@@ -60,12 +62,16 @@ function initProps(file, absPath) {
 
         contents: {
             get: function get() {
-                return sh.cat(absPath);
+                return fs.readFileSync(fd, { encoding: 'utf8' });
             },
             set: function set(newValue) {
-                sh.echo(newValue).to(absPath);
+                fs.writeFileSync(fd, newValue, { encoding: 'utf8' });
                 return newValue;
             }
+        },
+
+        filename: {
+            value: path.parse(absPath).base
         }
 
     });

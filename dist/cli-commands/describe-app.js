@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -54,12 +54,16 @@ var DescribeAppCommand = function (_CliCommand) {
 
             var stats = app.calcStats();
 
-            process.stdout.write('\n ' + _safe2.default.bold.yellow(' /**') + '\n ' + _safe2.default.bold.yellow(util.format('  * %s - v%s', pkg.name, pkg.version)) + '\n ' + _safe2.default.bold.yellow('  */') + '\n');
+            process.stdout.write(_safe2.default.bold.yellow('\n  /**' + ('\n   * ' + pkg.name + ' - v' + pkg.version) + '\n   */\n'));
 
             process.stdout.write('\n  ' + _safe2.default.underline('File stats:') + '\n\n');
 
             Object.keys(stats).forEach(function (key) {
-                process.stdout.write('    ' + _safe2.default.green(_safe2.default.bold(stats[key])) + '   ' + _safe2.default.white(key) + '\n');
+
+                var renderedValue = _safe2.default.green(_safe2.default.bold(stats[key]));
+                var renderedKey = _safe2.default.white(key);
+
+                process.stdout.write('     ' + renderedValue + '   ' + renderedKey + '\n');
             });
 
             process.stdout.write('\n');

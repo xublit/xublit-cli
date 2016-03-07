@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -205,8 +205,8 @@ function initProps(directory, absPath) {
 
     var basename = path.basename(absPath);
 
-    var files = [];
-    var subdirs = [];
+    var filenames = [];
+    var subdirnames = [];
 
     Object.defineProperties(directory, {
 
@@ -228,14 +228,28 @@ function initProps(directory, absPath) {
             value: cachedSubdirs
         },
 
-        files: {
-            value: files,
-            enumerable: true
+        dirname: {
+            value: path.parse(absPath).base
         },
 
-        subdirs: {
-            value: subdirs,
-            enumerable: true
+        filenames: {
+            enumerable: true,
+            value: filenames
+        },
+
+        /* depreciated */files: {
+            enumerable: true,
+            value: filenames
+        },
+
+        subdirnames: {
+            enumerable: true,
+            value: subdirnames
+        },
+
+        /* depreciated */subdirs: {
+            enumerable: true,
+            value: subdirnames
         }
 
     });

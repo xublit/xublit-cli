@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -12,17 +12,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _util = require('util');
-
-var util = _interopRequireWildcard(_util);
-
 var _abstract = require('./abstract');
 
 var _abstract2 = _interopRequireDefault(_abstract);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -43,16 +37,45 @@ var RunAppCommand = function (_CliCommand) {
         key: 'run',
         value: function run() {
 
-            this.xublitCli.assertXublitAppInPwd();
+            this.assertInAppDir();
+
+            this.attemptToStartApp();
+        }
+    }, {
+        key: 'assertInAppDir',
+        value: function assertInAppDir() {
+
+            try {
+                this.xublitCli.assertXublitAppInPwd();
+            } catch (error) {
+                this.startFailed('NotInAppDir', 'Xublit application not found in current dir');
+            }
+        }
+    }, {
+        key: 'attemptToStartApp',
+        value: function attemptToStartApp() {
+
+            var appName = this.xublitCli.app.npmConfig.name;
+            var startMessage = 'Starting ' + appName + ' application...';
+
+            this.log('white', startMessage);
 
             try {
                 this.xublitCli.app.start();
             } catch (error) {
 
-                this.reportFailure(util.format('Failed to start %s - %s: %s', this.xublitCli.app.npmConfig.name, error.constructor.name, error.message));
+                this.debug(error);
 
-                process.exit(1);
+                this.startFailed(error.constructor.name, error.message);
             }
+        }
+    }, {
+        key: 'startFailed',
+        value: function startFailed(errorType, message) {
+
+            this.reportFailure('Failed to start application - ' + errorType + ': ' + message);
+
+            process.exit(1);
         }
     }]);
 

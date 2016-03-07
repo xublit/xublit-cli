@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -16,19 +16,15 @@ var _path = require('path');
 
 var path = _interopRequireWildcard(_path);
 
-var _util = require('util');
-
-var util = _interopRequireWildcard(_util);
-
 var _shelljs = require('shelljs');
 
 var shell = _interopRequireWildcard(_shelljs);
 
-var _constants = require('../constants');
+var _constants = require('../../constants');
 
 var __ = _interopRequireWildcard(_constants);
 
-var _directory = require('./directory');
+var _directory = require('../directory');
 
 var _directory2 = _interopRequireDefault(_directory);
 
@@ -42,31 +38,31 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var CliTempRoot = function (_Directory) {
-    _inherits(CliTempRoot, _Directory);
+var CliAppDataRoot = function (_Directory) {
+    _inherits(CliAppDataRoot, _Directory);
 
-    function CliTempRoot(absolutePath) {
-        _classCallCheck(this, CliTempRoot);
+    function CliAppDataRoot(absolutePath) {
+        _classCallCheck(this, CliAppDataRoot);
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CliTempRoot).call(this, absolutePath));
+        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CliAppDataRoot).call(this, absolutePath));
 
         initProps(_this);
 
         return _this;
     }
 
-    return CliTempRoot;
+    return CliAppDataRoot;
 }(_directory2.default);
 
-exports.default = CliTempRoot;
+exports.default = CliAppDataRoot;
 
 
-function initProps(cliTempRoot) {
+function initProps(cliAppDataRoot) {
 
-    var procSubdir = new _directory2.default(cliTempRoot.absolutePath('proc'));
-    var cacheSubdir = new _directory2.default(cliTempRoot.absolutePath('cache'));
+    var procSubdir = new _directory2.default(cliAppDataRoot.absolutePath('proc'));
+    var cacheSubdir = new _directory2.default(cliAppDataRoot.absolutePath('cache'));
 
-    Object.defineProperties(cliTempRoot, {
+    Object.defineProperties(cliAppDataRoot, {
 
         procSubdir: {
             value: procSubdir
@@ -78,4 +74,4 @@ function initProps(cliTempRoot) {
 
     });
 }
-//# sourceMappingURL=cli-tmp-root.js.map
+//# sourceMappingURL=cli-app-data-root.js.map

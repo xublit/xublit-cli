@@ -12,13 +12,19 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _safe = require('colors/safe');
+
+var _safe2 = _interopRequireDefault(_safe);
+
+var _duration = require('../utils/renderers/duration');
+
+var _duration2 = _interopRequireDefault(_duration);
+
 var _abstract = require('./abstract');
 
 var _abstract2 = _interopRequireDefault(_abstract);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -26,41 +32,48 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var AddConfigValuesCommand = function (_CliCommand) {
-    _inherits(AddConfigValuesCommand, _CliCommand);
+var LsprocCommand = function (_CliCommand) {
+    _inherits(LsprocCommand, _CliCommand);
 
-    function AddConfigValuesCommand(xublitCli) {
-        _classCallCheck(this, AddConfigValuesCommand);
+    function LsprocCommand(xublitCli) {
+        _classCallCheck(this, LsprocCommand);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(AddConfigValuesCommand).call(this, xublitCli));
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(LsprocCommand).call(this, xublitCli));
     }
 
-    _createClass(AddConfigValuesCommand, [{
+    _createClass(LsprocCommand, [{
         key: 'run',
         value: function run() {
-            var _config$key;
 
-            this.xublitCli.assertXublitAppInPwd();
+            var durationRenderer = new _duration2.default();
 
-            var valuesToAdd = this.cmdArgs;
-            var key = valuesToAdd.splice(0, 1);
+            var running = this.xublitCli.processManager.running;
+            var numRunning = running.length;
 
-            var app = this.xublitCli.app;
-            var xublitConfigFile = app.rootDirectory.xublitConfigFile;
+            var renderedNumRunning = _safe2.default.green(numRunning);
+            var runningProcesses = numRunning === 1 ? ' running process' : ' running processes';
 
-            var config = xublitConfigFile.parseContents(JSON.parse);
-            if (!(key in config)) {
-                config[key] = [];
+            process.stdout.write('\n  ' + renderedNumRunning + ' ' + runningProcesses);
+
+            if (numRunning < 1) {
+                return;
             }
 
-            (_config$key = config[key]).push.apply(_config$key, _toConsumableArray(valuesToAdd));
+            running.forEach(function (proc) {
 
-            xublitConfigFile.contents = JSON.stringify(config, undefined, '  ');
+                var xublitPid = _safe2.default.blue(proc.xublitPid);
+                var appRootPath = _safe2.default.grey(proc.appRoot);
+                var uptime = durationRenderer.render(proc.uptime);
+
+                process.stdout.write('\n' + ('\n    ' + xublitPid) + ('\n    ' + appRootPath + '\n') + ('\n      (PID)    ' + proc.pid) + ('\n      (Uptime) ' + uptime));
+            });
+
+            process.stdout.write('\n');
         }
     }]);
 
-    return AddConfigValuesCommand;
+    return LsprocCommand;
 }(_abstract2.default);
 
-exports.default = AddConfigValuesCommand;
-//# sourceMappingURL=add-config-values.js.map
+exports.default = LsprocCommand;
+//# sourceMappingURL=lsproc.js.map

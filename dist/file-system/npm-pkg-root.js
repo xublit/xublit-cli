@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -17,10 +17,6 @@ require('babel-polyfill');
 var _path = require('path');
 
 var path = _interopRequireWildcard(_path);
-
-var _util = require('util');
-
-var util = _interopRequireWildcard(_util);
 
 var _shelljs = require('shelljs');
 
@@ -62,7 +58,7 @@ var NpmPackageRoot = function (_Directory) {
         value: function validateNpmPackageConfig() {
 
             if (!this.containsNpmPackageConfigFile) {
-                throw new Error(util.format('No %s found in %s', __.NPM_PACKAGE_CONFIG_FILENAME, this.absPath));
+                throw new Error('No ' + __.NPM_PACKAGE_CONFIG_FILENAME + ' found in ' + this.absPath);
             }
         }
     }]);

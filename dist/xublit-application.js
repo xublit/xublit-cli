@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -42,16 +42,14 @@ var jsFilePathRegExp = /.+\.(js|node)$/;
 var envConfigFilePathRegExp = /(\/|\\)env(\/|\\).+\.(yml|yaml)$/;
 
 var XublitApplication = function () {
-    function XublitApplication(absolutePath) {
+    function XublitApplication(xublitCli, absolutePath) {
         _classCallCheck(this, XublitApplication);
 
         if (!XublitApplication.isApplicationDirectory(absolutePath)) {
-            throw new Error(util.format('Xublit Application not found in %s', absolutePath));
+            throw new Error('Xublit Application not found in ' + absolutePath);
         }
 
-        initProps(this, absolutePath);
-
-        initProcessManager(this);
+        initProps(this, xublitCli, absolutePath);
     }
 
     _createClass(XublitApplication, [{
@@ -65,7 +63,7 @@ var XublitApplication = function () {
         key: 'initAppProcess',
         value: function initAppProcess() {
 
-            this.processManager.initNewNodeProcess(path.join(__dirname, 'app-instance.js'));
+            this.xublitCli.processManager.initNewNodeProcess(this.rootDirectory, path.join(__dirname, 'app-instance.js'));
 
             return this;
         }
@@ -73,21 +71,21 @@ var XublitApplication = function () {
         key: 'start',
         value: function start() {
 
-            this.doPreflightChecks().initAppProcess();
+            this.performPreflightChecks().initAppProcess();
 
             return this;
         }
     }, {
-        key: 'doPreflightChecks',
-        value: function doPreflightChecks() {
+        key: 'performPreflightChecks',
+        value: function performPreflightChecks() {
 
             var rootDirectory = this.rootDirectory;
 
-            if (!rootDirectory.containsDir('node_modules')) {
-                throw new Error('Dir "node_modules" not found, please run `$ npm install` first');
+            if (rootDirectory.containsDir('node_modules')) {
+                return this;
             }
 
-            return this;
+            throw new Error('Dir "node_modules" not found, please run `$ npm install` first');
         }
     }], [{
         key: 'isApplicationDirectory',
@@ -114,11 +112,7 @@ var XublitApplication = function () {
 exports.default = XublitApplication;
 
 
-function initProcessManager(xublitApplication) {
-    xublitApplication.processManager = new _procManager2.default(xublitApplication);
-}
-
-function initProps(xublitApplication, absolutePath) {
+function initProps(xublitApplication, xublitCli, absolutePath) {
 
     var processManager;
 
@@ -129,22 +123,16 @@ function initProps(xublitApplication, absolutePath) {
 
     Object.defineProperties(xublitApplication, {
 
+        xublitCli: {
+            value: xublitCli
+        },
+
         rootDirectory: {
             value: applicationRoot
         },
 
         processManager: {
-            get: function get() {
-                return processManager;
-            },
-            set: function set(newValue) {
-
-                if (undefined !== processManager) {
-                    return;
-                }
-
-                processManager = newValue;
-            }
+            value: processManager
         },
 
         config: {

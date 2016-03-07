@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -11,6 +11,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _fs = require('fs');
+
+var fs = _interopRequireWildcard(_fs);
+
+var _path = require('path');
+
+var path = _interopRequireWildcard(_path);
 
 var _constants = require('./constants');
 
@@ -26,55 +34,102 @@ var _procIoId = require('./proc-io-id');
 
 var _procIoId2 = _interopRequireDefault(_procIoId);
 
+var _timeDifferential = require('./utils/time-differential');
+
+var _timeDifferential2 = _interopRequireDefault(_timeDifferential);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var REGFILE_FILENAME = __.PROCMGR_REGFILE_FILENAME;
-var REGISTRY_TEMPLATE = __.PROCMGR_REGISTRY_TEMPLATE;
+var REGEXP_PROC_INFO_FILENAME = /^proc\-([a-z0-9]+)\.json$/i;
 
 var ProcessManager = function () {
-    function ProcessManager(xublitApplication) {
-
-        // initRegfileIfNoneExists(xublitApplication);
-
-        // initProps(this, xublitApplication);
-
+    function ProcessManager(xublitCli) {
         _classCallCheck(this, ProcessManager);
+
+        initProps(this, xublitCli);
     }
 
     _createClass(ProcessManager, [{
+        key: 'listXublitProcessIds',
+        value: function listXublitProcessIds() {
+
+            var allProcDirFilenames = this.processDirectory.filenames;
+            var procFilenames = allProcDirFilenames.filter(function (filename) {
+                return REGEXP_PROC_INFO_FILENAME.test(filename);
+            });
+
+            return procFilenames.map(function (procFilename) {
+                return procFilename.match(REGEXP_PROC_INFO_FILENAME)[1];
+            });
+        }
+    }, {
+        key: 'statProcess',
+        value: function statProcess(xublitProcessId) {
+
+            var procFile;
+            var filename = procIdToFilename(xublitProcessId);
+
+            if (!this.processDirectory.containsFile(filename)) {
+                return undefined;
+            }
+
+            procFile = this.processDirectory.file(filename);
+
+            try {
+                var stats = JSON.parse(procFile.contents);
+                stats.uptime = timeSince(stats.startedAt);
+                return stats;
+            } catch (e) {
+                console.log(e.stack);
+            }
+        }
+    }, {
         key: 'initNewNodeProcess',
-        value: function initNewNodeProcess(absPath) {
+        value: function initNewNodeProcess(pwd, absPath) {
 
-            // if (!path.isAbsolute(absPath)) {
-            //     throw new Error('First argument must be an absolute path');
-            // }
+            if (!path.isAbsolute(absPath)) {
+                throw new Error('First argument must be an absolute path');
+            }
 
-            // var stdio = createIoPipes(this.directory);
+            var appRootPath = pwd.absPath;
+            var processDirectory = this.processDirectory;
 
-            // var args = [];
-            // var opts = {
-            //     detached: true,
-            //     stdio: [
-            //         stdio.stdinFilename,
-            //         stdio.stdoutFilename,
-            //         stdio.stderrFilename,
-            //     ],
-            //     env: {
-            //         pwd: this.rootDirectory.absPath,
-            //     },
-            // };
+            var xublitProcessId = new _procIoId2.default();
 
-            // var childProcess = fork(absPath, args, opts);
-            // var pid = getPid(childProcess);
+            var stdio = createProcessFilesFor(xublitProcessId).in(this.processDirectory);
 
-            // child.unref();
+            var args = [];
+            var opts = {
+                detached: true,
+                stdio: [stdio.in, stdio.out, stdio.err],
+                env: {
+                    pwd: appRootPath
+                }
+            };
 
-            // return new ProcessControlInterface(stdio);
+            var childProcess = (0, _child_process.fork)(absPath, args, opts);
+            var pid = getPidFor(childProcess);
 
+            childProcess.unref();
+
+            var now = Date.now();
+            var procInfo = {
+                pid: pid,
+                xublitPid: xublitProcessId.value,
+                appRoot: appRootPath,
+                startedAt: now,
+                stoppedAt: null
+            };
+
+            var procInfoFile = processDirectory.mkfile(procIdToFilename(xublitProcessId));
+
+            procInfoFile.contents = JSON.stringify(procInfo, undefined, '  ');
+
+            return new _procCtrlInterface2.default(procInfoFile);
         }
     }]);
 
@@ -84,67 +139,83 @@ var ProcessManager = function () {
 exports.default = ProcessManager;
 
 
-function createIoPipes(targetDirectory) {
+function createProcessFilesFor(xublitProcessId) {
 
-    // var ioId = IoId.uniqueIoId(targetDirectory);
+    var stdInFilename = xublitProcessId + '.in';
+    var stdOutFilename = xublitProcessId + '.out';
+    var stdErrFilename = xublitProcessId + '.err';
 
-    // var stdinFilePath = targetDirectory.mkfile(ioId.stdinFilename).absPath;
-    // var stdoutFilePath = targetDirectory.mkfile(ioId.stdoutFilename).absPath;
-    // var stderrFilePath = targetDirectory.mkfile(ioId.stderrFilename).absPath;
-
-    // return {
-    //     in: fs.openSync(stdinFilePath, 'a'),
-    //     out: fs.openSync(stdoutFilePath, 'a'),
-    //     err: fs.openSync(stderrFilePath, 'a'),
-    // };
-
+    return {
+        in: function _in(directory) {
+            return {
+                in: fs.openSync(directory.mkfile(stdInFilename).absPath, 'a'),
+                out: fs.openSync(directory.mkfile(stdOutFilename).absPath, 'a'),
+                err: fs.openSync(directory.mkfile(stdErrFilename).absPath, 'a')
+            };
+        }
+    };
 }
 
-function getPid(childProcess) {
+function getPidFor(childProcess) {
     return childProcess.pid;
 }
 
 function kill(pid, signal) {}
 
-function initRegfileIfNoneExists(xublitApplication) {
-
-    if (xublitApplication.rootDir.containsFile(REGFILE_FILENAME)) {
-        return;
-    }
-
-    var currentTs = Date.now();
-    var regfile = directory.mkfile(REGFILE_FILENAME);
-    var registry = Object.assign({}, REGISTRY_TEMPLATE, {
-        createdAt: currentTs,
-        lastModifiedAt: currentTs,
-        path: directory.absPath
-    });
-
-    regfile.contents = JSON.stringify(registry, undefined, '  ');
+function procIdToFilename(xublitProcessId) {
+    return 'proc-' + xublitProcessId + '.json';
 }
 
-function initProps(processManager, xublitApplication) {
+function initProps(processManager, xublitCli) {
 
-    var rootDirectory = xublitApplication.rootDirectory;
-    var regfile = rootDirectory.file(REGFILE_FILENAME);
-    var registry = regfile.parseContents(JSON.parse);
+    var dataDirectory = xublitCli.dataDirectory;
+    var processDirectory = dataDirectory.procSubdir;
 
     Object.defineProperties(processManager, {
 
-        processes: {
+        xublitCli: {
+            value: xublitCli
+        },
+
+        running: {
             get: function get() {
-                return registry.running.slice(0);
+
+                var xublitProcessIds = processManager.listXublitProcessIds();
+
+                var processes = xublitProcessIds.map(function (xublitProcessId) {
+                    return processManager.statProcess(xublitProcessId);
+                });
+
+                return processes.filter(function (proc) {
+
+                    if (undefined === proc) {
+                        return false;
+                    }
+
+                    if (null !== proc.stoppedAt) {
+                        return false;
+                    }
+
+                    return true;
+                });
             }
         },
 
-        registry: {
-            value: registry
-        },
-
-        rootDirectory: {
-            value: rootDirectory
+        processDirectory: {
+            value: processDirectory
         }
 
     });
+}
+
+function listOfProcessesIn(processDirectory) {
+    return processDirectory.files.filter(function (processFileName) {
+        return (/[0-9a-z]+]\.json/.test(processFileName)
+        );
+    });
+}
+
+function timeSince(ms) {
+    return new _timeDifferential2.default(Date.now(), ms);
 }
 //# sourceMappingURL=proc-manager.js.map

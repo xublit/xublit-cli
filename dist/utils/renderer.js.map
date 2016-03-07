@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/utils/renderer.es6"],"names":[],"mappings":";;;;;;;;;;IAAqB;AAEjB,aAFiB,QAEjB,GAAe;8BAFE,UAEF;KAAf;;iBAFiB;;0DAMkB;;;;;WANlB","file":"renderer.js","sourcesContent":["export default class Renderer {\n\n    constructor () {\n\n    }\n\n    render (/* some class instance */) {\n        /* generate & return render */\n    }\n\n}\n"]}

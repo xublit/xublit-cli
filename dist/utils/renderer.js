@@ -4,7 +4,7 @@
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -14,51 +14,20 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var IoId = function () {
-    function IoId() {
-        _classCallCheck(this, IoId);
-
-        initAttrs(this);
+var Renderer = function () {
+    function Renderer() {
+        _classCallCheck(this, Renderer);
     }
 
-    _createClass(IoId, [{
-        key: 'toString',
-        value: function toString() {
-            return this.value;
+    _createClass(Renderer, [{
+        key: "render",
+        value: function render() /* some class instance */{
+            /* generate & return render */
         }
     }]);
 
-    return IoId;
+    return Renderer;
 }();
 
-exports.default = IoId;
-
-
-function initAttrs(ioId, ioIdStr) {
-
-    Object.defineProperties(ioId, {
-
-        value: {
-            value: createRandomIoId()
-        }
-
-    });
-}
-
-function createRandomIoId() {
-    return randomHexToBase64().replace(/[\+\/=]/g, '');
-}
-
-function randomHexToBase64() {
-
-    var randomHex = Math.random().toString().replace('.', '');
-
-    if (1 === randomHex.length % 2) {
-        randomHex = randomHex + '0';
-    }
-
-    randomHex = new Buffer(randomHex, 'hex');
-
-    return randomHex.toString('base64');
-}
-//# sourceMappingURL=proc-io-id.js.map
+exports.default = Renderer;
+//# sourceMappingURL=renderer.js.map

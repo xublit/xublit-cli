@@ -1,6 +1,6 @@
 /**
  * Xublit command line interface
- * @version v0.1.0-dev-2016-02-18
+ * @version v0.1.0-dev-2016-03-08
  * @link 
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -16,19 +16,11 @@ var _safe = require('colors/safe');
 
 var _safe2 = _interopRequireDefault(_safe);
 
-var _util = require('util');
-
-var util = _interopRequireWildcard(_util);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ERROR_ABSTRACT_METHOD_NOT_IMPLEMENTED = 'Abstract method %s not implemented in %s';
 
 var CHECK = '✔';
 var CROSS = '✘';
@@ -51,6 +43,16 @@ var CliCommand = function () {
         key: 'writeToStderr',
         value: function writeToStderr(string) {
             process.stderr.write(string);
+        }
+    }, {
+        key: 'debug',
+        value: function debug(error) {
+
+            if (true !== this.debugOn) {
+                return;
+            }
+
+            this.writeToStdout(String(error.stack) + '\n');
         }
     }, {
         key: 'log',
@@ -94,6 +96,8 @@ exports.default = CliCommand;
 
 function initProps(cliCommand, xublitCli) {
 
+    var argv = [].concat(_toConsumableArray(process.argv)).slice(3);
+
     Object.defineProperties(cliCommand, {
 
         xublitCli: {
@@ -102,19 +106,33 @@ function initProps(cliCommand, xublitCli) {
 
         cmdArgs: {
             get: function get() {
-
-                var args = [];
-
-                [].concat(_toConsumableArray(process.argv)).slice(3).forEach(function (arg) {
+                return argv.filter(function (arg) {
 
                     if ('-' === arg.substr(0, 1)) {
-                        return;
+                        return false;
                     }
 
-                    args.push(arg);
+                    return true;
                 });
+            }
+        },
 
-                return args;
+        options: {
+            get: function get() {
+                return argv.filter(function (arg) {
+
+                    if ('-' !== arg.substr(0, 1)) {
+                        return false;
+                    }
+
+                    return true;
+                });
+            }
+        },
+
+        debugOn: {
+            get: function get() {
+                return cliCommand.options.indexOf('--debug') > -1;
             }
         }
 
@@ -122,6 +140,9 @@ function initProps(cliCommand, xublitCli) {
 }
 
 function newAbstractMethodError(cliCommand, methodName) {
-    return new Error(util.format(ERROR_ABSTRACT_METHOD_NOT_IMPLEMENTED, cliCommand.constructor.name, methodName));
+
+    var className = cliCommand.constructor.name;
+
+    return new Error('Abstract method ' + methodName + ' not implemented in ' + className);
 }
 //# sourceMappingURL=abstract.js.map
